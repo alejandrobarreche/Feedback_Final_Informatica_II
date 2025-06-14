@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Space News Blog</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #0f0f23 0%, #1a1a3e 100%);
+      color: #ffffff;
+      min-height: 100vh;
+    }
+
+    header {
+      background: rgba(0, 0, 0, 0.3);
+      padding: 2rem 0;
+      text-align: center;
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    h1 {
+      font-size: 3rem;
+      margin-bottom: 0.5rem;
+      background: linear-gradient(45deg, #00d4ff, #ff00f7);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .subtitle {
+      font-size: 1.2rem;
+      opacity: 0.8;
+      margin-bottom: 1rem;
+    }
+
+    .header-buttons {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .button {
+      background: linear-gradient(45deg, #00d4ff, #ff00f7);
+      border: none;
+      padding: 12px 24px;
+      border-radius: 25px;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-block;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 20px rgba(0, 212, 255, 0.3);
+    }
+
+    .button.secondary {
+      background: linear-gradient(45deg, #ff6b6b, #feca57);
+    }
+
+    .button.secondary:hover {
+      box-shadow: 0 10px 20px rgba(255, 107, 107, 0.3);
+    }
+
+    main {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+
+    .message {
+      padding: 1rem;
+      border-radius: 10px;
+      margin-bottom: 2rem;
+      text-align: center;
+      font-weight: bold;
+    }
+
+    .message.success {
+      background: rgba(46, 204, 113, 0.2);
+      border: 1px solid #2ecc71;
+      color: #2ecc71;
+    }
+
+    .message.info {
+      background: rgba(52, 152, 219, 0.2);
+      border: 1px solid #3498db;
+      color: #3498db;
+    }
+
+    .message.error {
+      background: rgba(231, 76, 60, 0.2);
+      border: 1px solid #e74c3c;
+      color: #e74c3c;
+    }
+
+    .articles-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+      gap: 2rem;
+      margin-top: 2rem;
+    }
+
+    .article-card {
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 15px;
+      overflow: hidden;
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      transform-origin: center center;
+      will-change: transform;
+    }
+
+    .article-card:hover {
+      transform: scale(1.05);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+    }
+
+    .article-image {
+      width: 100%;
+      height: 200px;
+      object-fit: cover;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .article-content {
+      padding: 1.5rem;
+    }
+
+    .article-title {
+      font-size: 1.3rem;
+      font-weight: bold;
+      margin-bottom: 1rem;
+      color: #00d4ff;
+      line-height: 1.4;
+    }
+
+    .article-title a:hover {
+      color: #ff00f7 !important;
+    }
+
+    .article-summary {
+      color: rgba(255, 255, 255, 0.8);
+      line-height: 1.6;
+      margin-bottom: 1rem;
+    }
+
+    .article-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.9rem;
+      color: rgba(255, 255, 255, 0.6);
+      margin-bottom: 1rem;
+    }
+
+    .article-site {
+      background: rgba(255, 0, 247, 0.2);
+      padding: 4px 8px;
+      border-radius: 12px;
+      font-size: 0.8rem;
+    }
+
+    .read-more {
+      display: inline-block;
+      color: #00d4ff;
+      text-decoration: none;
+      font-weight: bold;
+      transition: color 0.3s ease;
+    }
+
+    .read-more:hover {
+      color: #ff00f7;
+    }
+
+    .no-articles {
+      text-align: center;
+      padding: 4rem 2rem;
+      color: rgba(255, 255, 255, 0.6);
+    }
+
+    .no-articles h2 {
+      margin-bottom: 1rem;
+      color: rgba(255, 255, 255, 0.8);
+    }
+
+    .loading {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.7);
+      z-index: 1000;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .loading.show {
+      display: flex;
+    }
+
+    .spinner {
+      width: 50px;
+      height: 50px;
+      border: 5px solid rgba(255, 255, 255, 0.3);
+      border-top: 5px solid #00d4ff;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    @media (max-width: 768px) {
+      .articles-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+      }
+
+      h1 {
+        font-size: 2rem;
+      }
+
+      main {
+        padding: 1rem;
+      }
+
+      .header-buttons {
+        flex-direction: column;
+        align-items: center;
+      }
+    }
+  </style>
+</head>
+<body>
+<div class="loading" id="loading">
+  <div class="spinner"></div>
+</div>
+
+<header>
+  <h1>🚀 Space News</h1>
+  <p class="subtitle">Las últimas noticias del espacio y vuelos espaciales</p>
+  <div class="header-buttons">
+    <a href="#" class="button" onclick="fetchArticles()">🔄 Obtener Nuevas Noticias</a>
+    <a href="/api" class="button secondary">📡 Ver API</a>
+  </div>
+</header>
+
+<main>
+  <div th:if="${message}" class="message" th:classappend="${messageType != null ? messageType : 'info'}" th:text="${message}"></div>
+
+  <div th:if="${articles != null and !articles.empty}" class="articles-grid">
+    <article th:each="article : ${articles}" class="article-card">
+      <img th:src="${article.imageUrl}"
+           th:alt="${article.title}"
+           class="article-image"
+           onerror="this.src='https://via.placeholder.com/400x200/1a1a3e/00d4ff?text=Space+News'">
+
+      <div class="article-content">
+        <h2 class="article-title">
+          <a th:href="'/article/' + ${article.id}" th:text="${article.title}" style="color: inherit; text-decoration: none; transition: color 0.3s ease;">
+            Título del artículo
+          </a>
+        </h2>
+
+        <div class="article-meta">
+          <span class="article-site" th:text="${article.siteName}">Fuente</span>
+          <span th:text="${#strings.substring(article.publishedAt, 0, 10)}">Fecha</span>
+        </div>
+
+        <p class="article-summary" th:text="${#strings.length(article.summary) > 150 ? #strings.substring(article.summary, 0, 150) + '...' : article.summary}">
+          Resumen del artículo...
+        </p>
+
+        <a th:href="${article.url}" target="_blank" class="read-more">
+          Leer más →
+        </a>
+      </div>
+    </article>
+  </div>
+
+  <div th:if="${articles == null or articles.empty}" class="no-articles">
+    <h2>🌌 No hay artículos disponibles</h2>
+    <p>Haz clic en "Obtener Nuevas Noticias" para cargar los últimos artículos espaciales.</p>
+  </div>
+</main>
+
+<script>
+  function fetchArticles() {
+    document.getElementById('loading').classList.add('show');
+    window.location.href = '/fetch';
+  }
+
+  // Añadir efectos de parallax suave
+  window.addEventListener('scroll', () => {
+    const scrolled = window.pageYOffset;
+    const rate = scrolled * -0.5;
+    document.body.style.backgroundPosition = `center ${rate}px`;
+  });
+
+  // Animación de entrada para las tarjetas
+  const observerOptions = {
+    threshold: 0.1,
+    rootMargin: '0px 0px -50px 0px'
+  };
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.style.opacity = '1';
+        entry.target.style.transform = 'translateY(0)';
+      }
+    });
+  }, observerOptions);
+
+  // Aplicar animación a las tarjetas
+  document.addEventListener('DOMContentLoaded', () => {
+    const cards = document.querySelectorAll('.article-card');
+    cards.forEach((card, index) => {
+      card.style.opacity = '0';
+      card.style.transform = 'translateY(20px)';
+      card.style.transition = `opacity 0.6s ease ${index * 0.1}s, transform 0.6s ease ${index * 0.1}s`;
+      observer.observe(card);
+    });
+  });
+</script>
+</body>
+</html>

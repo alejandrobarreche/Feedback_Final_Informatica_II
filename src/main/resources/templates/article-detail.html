@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${article != null ? article.title + ' | Space News' : 'Artículo no encontrado | Space News'}">Space News - Artículo</title>
+    <meta th:if="${article != null}" th:content="${article.summary}" name="description">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0f0f23 0%, #1a1a3e 100%);
+            color: #ffffff;
+            min-height: 100vh;
+            line-height: 1.7;
+        }
+
+        .navbar {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 1rem 0;
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            background: linear-gradient(45deg, #00d4ff, #ff00f7);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-decoration: none;
+        }
+
+        .nav-buttons {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .nav-button {
+            background: linear-gradient(45deg, #00d4ff, #ff00f7);
+            border: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 0.9rem;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .nav-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(0, 212, 255, 0.3);
+        }
+
+        .nav-button.secondary {
+            background: linear-gradient(45deg, #ff6b6b, #feca57);
+        }
+
+        .nav-button.secondary:hover {
+            box-shadow: 0 8px 16px rgba(255, 107, 107, 0.3);
+        }
+
+        main {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .article-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .article-title {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 1rem;
+            background: linear-gradient(45deg, #00d4ff, #ff00f7);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            line-height: 1.3;
+        }
+
+        .article-meta {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 2rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.9rem;
+        }
+
+        .meta-icon {
+            font-size: 1.1rem;
+        }
+
+        .article-site {
+            background: rgba(255, 0, 247, 0.2);
+            color: #ff00f7;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-weight: bold;
+            border: 1px solid rgba(255, 0, 247, 0.3);
+        }
+
+        .article-image {
+            width: 100%;
+            max-height: 400px;
+            object-fit: cover;
+            border-radius: 15px;
+            margin-bottom: 2rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .article-content {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 15px;
+            padding: 2.5rem;
+            margin-bottom: 2rem;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .article-summary {
+            font-size: 1.2rem;
+            line-height: 1.8;
+            color: rgba(255, 255, 255, 0.9);
+            text-align: justify;
+        }
+
+        .article-actions {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-top: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .action-button {
+            background: linear-gradient(45deg, #00d4ff, #ff00f7);
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 1rem;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .action-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0, 212, 255, 0.3);
+        }
+
+        .action-button.secondary {
+            background: linear-gradient(45deg, #6c757d, #495057);
+        }
+
+        .action-button.secondary:hover {
+            box-shadow: 0 10px 20px rgba(108, 117, 125, 0.3);
+        }
+
+        .error-container {
+            text-align: center;
+            padding: 4rem 2rem;
+        }
+
+        .error-title {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            color: #e74c3c;
+        }
+
+        .error-message {
+            font-size: 1.2rem;
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 2rem;
+        }
+
+        .article-id {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: rgba(0, 0, 0, 0.5);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .breadcrumb {
+            margin-bottom: 2rem;
+            padding: 1rem 0;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.9rem;
+        }
+
+        .breadcrumb a {
+            color: #00d4ff;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .breadcrumb a:hover {
+            color: #ff00f7;
+        }
+
+        @media (max-width: 768px) {
+            main {
+                padding: 1rem;
+            }
+
+            .article-title {
+                font-size: 2rem;
+            }
+
+            .article-content {
+                padding: 1.5rem;
+            }
+
+            .nav-container {
+                padding: 0 1rem;
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .article-meta {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .article-actions {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .action-button {
+                width: 100%;
+                max-width: 300px;
+                justify-content: center;
+            }
+        }
+
+        /* Animaciones */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .fade-in {
+            animation: fadeInUp 0.6s ease-out;
+        }
+
+        .fade-in-delay {
+            animation: fadeInUp 0.6s ease-out 0.2s both;
+        }
+
+        .fade-in-delay-2 {
+            animation: fadeInUp 0.6s ease-out 0.4s both;
+        }
+    </style>
+</head>
+<body>
+<nav class="navbar">
+    <div class="nav-container">
+        <a href="/" class="logo">🚀 Space News</a>
+        <div class="nav-buttons">
+            <a href="/" class="nav-button secondary">← Volver al inicio</a>
+            <a href="/api" class="nav-button">📡 Ver API</a>
+        </div>
+    </div>
+</nav>
+
+<main>
+    <div th:if="${error}" class="error-container fade-in">
+        <h1 class="error-title">❌</h1>
+        <p class="error-message" th:text="${error}">Error desconocido</p>
+        <a href="/" class="action-button">🏠 Volver al inicio</a>
+    </div>
+
+    <div th:if="${article != null}">
+        <div class="breadcrumb fade-in">
+            <a href="/">Inicio</a> / <a href="/">Artículos</a> / <span th:text="${article.title}">Artículo actual</span>
+        </div>
+
+        <div class="article-id" th:text="'ID: ' + ${article.id}">ID: 1</div>
+
+        <header class="article-header fade-in">
+            <h1 class="article-title" th:text="${article.title}">Título del artículo</h1>
+
+            <div class="article-meta">
+                <div class="meta-item">
+                    <span class="meta-icon">📅</span>
+                    <span th:text="${#strings.substring(article.publishedAt, 0, 10)}">2024-01-15</span>
+                </div>
+                <div class="meta-item">
+                    <span class="meta-icon">🌐</span>
+                    <span class="article-site" th:text="${article.siteName}">Fuente</span>
+                </div>
+                <div class="meta-item" th:if="${article.handle}">
+                    <span class="meta-icon">🔗</span>
+                    <span th:text="'Handle: ' + ${article.handle}">Handle: 12345</span>
+                </div>
+            </div>
+        </header>
+
+        <div class="fade-in-delay">
+            <img th:src="${article.imageUrl}"
+                 th:alt="${article.title}"
+                 class="article-image"
+                 onerror="this.src='https://via.placeholder.com/800x400/1a1a3e/00d4ff?text=Space+News'">
+        </div>
+
+        <div class="article-content fade-in-delay-2">
+            <p class="article-summary" th:text="${article.summary}">
+                Resumen del artículo...
+            </p>
+        </div>
+
+        <div class="article-actions fade-in-delay-2">
+            <a th:href="${article.url}" target="_blank" class="action-button">
+                🔗 Leer artículo completo
+            </a>
+            <button onclick="shareArticle()" class="action-button secondary">
+                📤 Compartir
+            </button>
+            <button onclick="window.history.back()" class="action-button secondary">
+                ← Volver
+            </button>
+        </div>
+    </div>
+</main>
+
+<script>
+    function shareArticle() {
+        if (navigator.share) {
+            navigator.share({
+                title: document.title,
+                text: document.querySelector('meta[name="description"]')?.content || 'Artículo interesante sobre noticias espaciales',
+                url: window.location.href
+            }).catch(console.error);
+        } else {
+            // Fallback para navegadores que no soportan Web Share API
+            const url = window.location.href;
+            navigator.clipboard.writeText(url).then(() => {
+                alert('✅ URL copiada al portapapeles');
+            }).catch(() => {
+                // Mostrar la URL en un prompt como último recurso
+                prompt('Copia esta URL para compartir:', url);
+            });
+        }
+    }
+
+    // Smooth scroll para navegación
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+            e.preventDefault();
+            const target = document.querySelector(this.getAttribute('href'));
+            if (target) {
+                target.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+            }
+        });
+    });
+
+    // Efectos de parallax suave en el fondo
+    window.addEventListener('scroll', () => {
+        const scrolled = window.pageYOffset;
+        const rate = scrolled * -0.3;
+        document.body.style.backgroundPosition = `center ${rate}px`;
+    });
+</script>
+</body>
+</html>

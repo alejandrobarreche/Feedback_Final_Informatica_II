@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Space News API - Documentación</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0f0f23 0%, #1a1a3e 100%);
+            color: #ffffff;
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        header {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 2rem 0;
+            text-align: center;
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(45deg, #00d4ff, #ff00f7);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.8;
+            margin-bottom: 1rem;
+        }
+
+        .back-button {
+            background: linear-gradient(45deg, #ff6b6b, #feca57);
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .back-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(255, 107, 107, 0.3);
+        }
+
+        main {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .endpoint-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .endpoint-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .method {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            margin-right: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .method.get {
+            background: rgba(46, 204, 113, 0.2);
+            color: #2ecc71;
+            border: 1px solid #2ecc71;
+        }
+
+        .method.post {
+            background: rgba(52, 152, 219, 0.2);
+            color: #3498db;
+            border: 1px solid #3498db;
+        }
+
+        .endpoint-title {
+            font-size: 1.5rem;
+            color: #00d4ff;
+            margin-bottom: 0.5rem;
+        }
+
+        .endpoint-url {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 1rem;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            color: #feca57;
+            margin: 1rem 0;
+            border-left: 4px solid #00d4ff;
+        }
+
+        .endpoint-description {
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 1rem;
+        }
+
+        .response-example {
+            background: rgba(0, 0, 0, 0.5);
+            padding: 1rem;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            color: #e8e8e8;
+            margin-top: 1rem;
+            overflow-x: auto;
+        }
+
+        .try-button {
+            background: linear-gradient(45deg, #00d4ff, #ff00f7);
+            border: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 0.9rem;
+            transition: transform 0.3s ease;
+        }
+
+        .try-button:hover {
+            transform: scale(1.05);
+        }
+
+        .intro {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            text-align: center;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .status-indicator {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #2ecc71;
+            margin-right: 0.5rem;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
+        @media (max-width: 768px) {
+            main {
+                padding: 1rem;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+
+            .endpoint-card {
+                padding: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+<header>
+    <h1>📡 Space News API</h1>
+    <p class="subtitle">Documentación de endpoints disponibles</p>
+    <a href="/" class="back-button">← Volver al inicio</a>
+</header>
+
+<main>
+    <div class="intro">
+        <h2 style="color: #00d4ff; margin-bottom: 1rem;">
+            <span class="status-indicator"></span>
+            API Status: Activa
+        </h2>
+        <p>Esta API te permite acceder a los artículos de noticias espaciales almacenados en la base de datos. Todos los endpoints devuelven datos en formato JSON.</p>
+    </div>
+
+    <div class="endpoint-card">
+        <div class="method get">GET</div>
+        <h3 class="endpoint-title">Obtener todos los artículos</h3>
+        <div class="endpoint-url">/api/articles</div>
+        <p class="endpoint-description">
+            Devuelve una lista completa de todos los artículos guardados en la base de datos.
+        </p>
+        <a href="/api/articles" target="_blank" class="try-button">🚀 Probar endpoint</a>
+
+        <div class="response-example">
+            <strong>Ejemplo de respuesta:</strong>
+            [
+            {
+            "id": 1,
+            "handle": "12345",
+            "title": "NASA launches new Mars mission",
+            "authors": [],
+            "url": "https://example.com/news/mars-mission",
+            "imageUrl": "https://example.com/image.jpg",
+            "siteName": "Space News",
+            "summary": "NASA successfully launched...",
+            "publishedAt": "2024-01-15T10:30:00Z"
+            }
+            ]
+        </div>
+    </div>
+
+    <div class="endpoint-card">
+        <div class="method get">GET</div>
+        <h3 class="endpoint-title">Obtener y guardar nuevos artículos</h3>
+        <div class="endpoint-url">/api/fetch</div>
+        <p class="endpoint-description">
+            Consulta la API externa de Spaceflight News para obtener los últimos artículos y los guarda en la base de datos. Solo se guardan artículos que no existan previamente.
+        </p>
+        <a href="/api/fetch" target="_blank" class="try-button">🚀 Probar endpoint</a>
+
+        <div class="response-example">
+            <strong>Ejemplo de respuesta:</strong>
+            [
+            {
+            "id": 15,
+            "handle": "67890",
+            "title": "SpaceX successfully lands rocket",
+            "authors": [],
+            "url": "https://example.com/news/spacex-landing",
+            "imageUrl": "https://example.com/spacex.jpg",
+            "siteName": "SpaceX News",
+            "summary": "SpaceX has successfully...",
+            "publishedAt": "2024-01-16T08:45:00Z"
+            }
+            ]
+        </div>
+    </div>
+
+    <div class="endpoint-card">
+        <div class="method get">GET</div>
+        <h3 class="endpoint-title">Contar artículos</h3>
+        <div class="endpoint-url">/api/articles/count</div>
+        <p class="endpoint-description">
+            Devuelve el número total de artículos almacenados en la base de datos.
+        </p>
+        <a href="/api/articles/count" target="_blank" class="try-button">🚀 Probar endpoint</a>
+
+        <div class="response-example">
+            <strong>Ejemplo de respuesta:</strong>
+            {
+            "count": 42,
+            "status": "success"
+            }
+        </div>
+    </div>
+
+    <div class="endpoint-card">
+        <div class="method post">POST</div>
+        <h3 class="endpoint-title">Eliminar todos los artículos</h3>
+        <div class="endpoint-url">/api/articles/delete</div>
+        <p class="endpoint-description">
+            <strong>⚠️ Cuidado:</strong> Este endpoint elimina TODOS los artículos de la base de datos. Esta acción no se puede deshacer.
+        </p>
+        <button onclick="deleteAllArticles()" class="try-button" style="background: linear-gradient(45deg, #e74c3c, #c0392b);">
+            🗑️ Eliminar todos (¡Cuidado!)
+        </button>
+
+        <div class="response-example">
+            <strong>Ejemplo de respuesta:</strong>
+            {
+            "message": "Todos los artículos han sido eliminados",
+            "status": "success"
+            }
+        </div>
+    </div>
+
+    <div style="background: rgba(255, 193, 7, 0.1); border: 1px solid #ffc107; border-radius: 10px; padding: 1.5rem; margin-top: 2rem;">
+        <h3 style="color: #ffc107; margin-bottom: 0.5rem;">💡 Notas importantes</h3>
+        <ul style="color: rgba(255, 255, 255, 0.8); margin-left: 1.5rem;">
+            <li>Todos los endpoints devuelven datos en formato JSON</li>
+            <li>Los artículos se identifican por su handle único para evitar duplicados</li>
+            <li>La API externa que se consulta es: <code>https://api.spaceflightnewsapi.net/v4/articles/</code></li>
+            <li>Los endpoints GET no requieren autenticación</li>
+            <li>El endpoint DELETE requiere método POST por seguridad</li>
+        </ul>
+    </div>
+</main>
+
+<script>
+    async function deleteAllArticles() {
+        if (confirm('⚠️ ¿Estás seguro de que quieres eliminar TODOS los artículos? Esta acción no se puede deshacer.')) {
+            if (confirm('🚨 ÚLTIMA CONFIRMACIÓN: Se eliminarán todos los datos. ¿Continuar?')) {
+                try {
+                    const response = await fetch('/api/articles/delete', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        }
+                    });
+
+                    const result = await response.text();
+                    alert('✅ ' + JSON.parse(result).message);
+                } catch (error) {
+                    alert('❌ Error al eliminar artículos: ' + error.message);
+                }
+            }
+        }
+    }
+
+    // Animación de entrada para las tarjetas
+    document.addEventListener('DOMContentLoaded', () => {
+        const cards = document.querySelectorAll('.endpoint-card');
+        cards.forEach((card, index) => {
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(20px)';
+            card.style.transition = `opacity 0.6s ease ${index * 0.1}s, transform 0.6s ease ${index * 0.1}s`;
+
+            setTimeout(() => {
+                card.style.opacity = '1';
+                card.style.transform = 'translateY(0)';
+            }, index * 100);
+        });
+    });
+</script>
+</body>
+</html>
